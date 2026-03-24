@@ -73,14 +73,41 @@
   <div class="sidebar">
     <h2>Navigation</h2>
     <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="demo_docking/index.html">Docking Notebook</a></li>
+      <li><a href="#" onclick="loadContent('home')">Home</a></li>
+      <li><a href="#" onclick="loadContent('demo_docking/index.html')">Docking Notebook</a></li>
     </ul>
   </div>
   
-  <div class="content">
+  <div class="content" id="content">
     <h1>Docking Visualization</h1>
     <p>Welcome to the docking demos and bioinformatics projects.</p>
   </div>
+  
+  <script>
+    function loadContent(path) {
+      const contentDiv = document.getElementById('content');
+      
+      if (path === 'home') {
+        contentDiv.innerHTML = `
+          <h1>Docking Visualization</h1>
+          <p>Welcome to the docking demos and bioinformatics projects.</p>
+        `;
+      } else {
+        fetch(path)
+          .then(response => response.text())
+          .then(html => {
+            // Extract body content from the fetched HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const bodyContent = doc.body.innerHTML;
+            contentDiv.innerHTML = bodyContent;
+          })
+          .catch(error => {
+            contentDiv.innerHTML = `<h1>Error</h1><p>Could not load content: ${error}</p>`;
+          });
+      }
+      return false;
+    }
+  </script>
 </body>
 </html>
