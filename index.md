@@ -5,5 +5,5 @@ This site hosts my docking demos and related bioinformatics projects.
 
 ## Projects
 
-- [Docking Notebook (HTML)](demo_docking/docking.html)
+- [Docking Notebook (HTML)](demo_docking/index.html)
 - More content coming soon...
