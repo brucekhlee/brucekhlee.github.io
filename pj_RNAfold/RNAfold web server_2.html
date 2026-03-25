@@ -1,0 +1,533 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- saved from url=(0081)http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/RNAfold.cgi?PAGE=3&ID=CMvwNqK4CL -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>RNAfold web server</title>
+  
+  <!--refresh-->
+  <link rel="stylesheet" href="./RNAfold web server_2_files/RNA.css" type="text/css">
+  <script type="text/javascript">
+     var page = "%%PROTOCLFILE%%";
+     var forwardpage = "%%FORWARDPAGE%%";
+     var topaste = ">test_sequence\nGGGCUAUUAGCUCAGUUGGUUAGAGCGCACCCCUGAUAAGGGUGAGGUCGCUGAUUCGAAUUCAGCAUAGCCCA";
+  </script>
+  <script src="./RNAfold web server_2_files/RNA.js" type="text/javascript"></script>
+  <script src="./RNAfold web server_2_files/jquery.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+  function show_probs ( mode, id_sequence, id_structure, input_sequence, input_stucture, probcolorarray, posencolorarray ) {
+    var span_seq = document.getElementById( id_sequence );
+    var span_struct = document.getElementById( id_structure );
+    var seq_array = input_sequence.split('');
+    var struct_array = input_stucture.split('');
+    var nuc = 0;
+    for(var i=0; i<seq_array.length; i++) {
+        if ( seq_array[i].match('[A-Z]') ) {
+           
+            if ( mode == 'probs' ) {
+               seq_array[i] = '<span style="background-color:'+probcolorarray[nuc]+';color:#ffffff">' + seq_array[i] + '</span>';
+               struct_array[i] = '<span style="background-color:'+probcolorarray[nuc]+';color:#ffffff">' + struct_array[i] + '</span>';
+            }
+            if ( mode == 'posen' ) {
+               seq_array[i] = '<span style="background-color:'+posencolorarray[nuc]+';color:#ffffff">' + seq_array[i] + '</span>';
+               struct_array[i] = '<span style="background-color:'+posencolorarray[nuc]+';color:#ffffff">' + struct_array[i] + '</span>';
+            }
+            if ( mode == 'none' ) {
+               seq_array[i] = '<span style="background-color:#ffffff;color:#000000">' + seq_array[i] + '</span>';
+               struct_array[i] = '<span style="background-color:#ffffff;color:#000000">' + struct_array[i] + '</span>';
+            }
+            nuc++;
+        }
+    }
+
+    span_seq.innerHTML = '<pre>'+seq_array.join('')+'</pre>';
+    span_struct.innerHTML = '<pre>'+struct_array.join('')+'</pre>';
+  }
+  </script>
+    <script type="text/javascript">
+$(function() {
+  /* bind event handlers */
+  $('#shapemethod').on('change', function(){
+    if($(this).val() == "deigan"){
+      $('#deigan_config').show();
+      $('#zarringhalam_config').hide();
+    } else {
+      $('#zarringhalam_config').show();
+      $('#deigan_config').hide();
+    }
+  });
+
+  $('#deigan_conversion').on('change', function(){
+    if($(this).val() == "mapping"){
+      $('#cutoff_input').hide();
+      $('#linear_input').hide();
+      $('#linearlog_input').hide();
+    } else if($(this).val() == "cutoff"){
+      $('#cutoff_input').show();
+      $('#linear_input').hide();
+      $('#linearlog_input').hide();
+    } else if($(this).val() == "skip"){
+      $('#cutoff_input').hide();
+      $('#linear_input').hide();
+      $('#linearlog_input').hide();
+    } else if($(this).val() == "linear"){
+      $('#cutoff_input').hide();
+      $('#linear_input').show();
+      $('#linearlog_input').hide();
+    } else {
+      $('#cutoff_input').hide();
+      $('#linear_input').hide();
+      $('#linearlog_input').show();
+    }
+  });
+
+  $('#mod_annot').on('change', function(){
+    if($(this).is(':checked')){
+      $("#mod_annot_block").removeAttr("disabled");
+      $("#mod_annot_keep").removeAttr("disabled");
+    } else {
+      $("#mod_annot_block").attr("disabled", true);
+      $("#mod_annot_keep").attr("disabled", true);
+    }
+  });
+
+  $('#modified').on('change', function(){
+    if($(this).is(':checked')){
+      $("#mod_annot_keep").prop("checked", true);
+    } else {
+      $("#mod_annot_keep").prop("checked", false);
+    }
+  });
+
+  $('#opt_constraints_title').click(function(){
+    $('#opt_constraints_title').find('img:first').attr("src","/RNAWebSuite/gfx/" + ($('#opt_constraints').is(':visible') ? "show.png" : "hide.png"));
+    $('#opt_constraints').toggle(400);
+  });
+
+  $('#opt_basic_title').click(function(){
+    $('#opt_basic_title').find('img:first').attr("src","/RNAWebSuite/gfx/" + ($('#opt_basic').is(':visible') ? "show.png" : "hide.png"));
+    $('#opt_basic').toggle(400);
+  });
+
+  $('#opt_dangles_title').click(function(){
+    $('#opt_dangles_title').find('img:first').attr("src","/RNAWebSuite/gfx/" + ($('#opt_dangles').is(':visible') ? "show.png" : "hide.png"));
+    $('#opt_dangles').toggle(400);
+  });
+
+  $('#opt_params_title').click(function(){
+    $('#opt_params_title').find('img:first').attr("src","/RNAWebSuite/gfx/" + ($('#opt_params').is(':visible') ? "show.png" : "hide.png"));
+    $('#opt_params').toggle(400);
+  });
+
+  $('#opt_mod_title').click(function(){
+    $('#opt_mod_title').find('img:first').attr("src","/RNAWebSuite/gfx/" + ($('#opt_mod').is(':visible') ? "show.png" : "hide.png"));
+    $('#opt_mod').toggle(400);
+  });
+
+  $('#opt_probing_title').click(function(){
+    $('#opt_probing_title').find('img:first').attr("src","/RNAWebSuite/gfx/" + ($('#opt_probing').is(':visible') ? "show.png" : "hide.png"));
+    $('#opt_probing').toggle(400);
+  });
+
+  $('#opt_output_title').click(function(){
+    $('#opt_output_title').find('img:first').attr("src","/RNAWebSuite/gfx/" + ($('#opt_output').is(':visible') ? "show.png" : "hide.png"));
+    $('#opt_output').toggle(400);
+  });
+
+  /* show/hide divs according to current selection */
+  $('#shapemethod').trigger('change');
+  $('#deigan_conversion').trigger('change');
+  $('#modified').trigger('change');
+  $('#mod_annot').trigger('change');
+  $('#opt_constraints').hide();
+  $('#opt_dangles').hide();
+  $('#opt_params').hide();
+  $('#opt_mod').hide();
+  $('#opt_probing').hide();
+});
+</script>
+</head>
+<body><div id="WzTtDiV" style="visibility: hidden; position: absolute; overflow: hidden; padding: 0px; width: 1919px; left: -1920px; top: 0px;"></div>
+
+<div id="container">
+<div id="header">
+        <div id="headerleft"><img src="./RNAfold web server_2_files/RNAfold.gif" usemap="#navi">
+        <map name="navi">
+          <area shape="rect" coords="0,0,400,54" href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/RNAfold.cgi">
+        </map>
+        </div>
+        <div id="headerright"><img src="./RNAfold web server_2_files/progress2.gif">
+        </div>
+        <div id="headermain">&nbsp;</div>
+        <div class="clear"></div>        
+</div>
+<div id="column2">
+        <div id="column1">
+                <div id="contentleft"></div>
+                <div id="contentright"></div>
+                <div id="contentmain">
+                <table style="width:100%;text-align:right;margin:0px;padding:0px;line-height:0.8em"><tbody><tr><td>[<a href="http://rna.tbi.univie.ac.at/">Home</a>|<a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/RNAfold.cgi">New job</a>|<a href="http://rna.tbi.univie.ac.at/RNAWebSuite/help.html" target="_blank">Help</a>]</td></tr></tbody></table>
+                <!-- CONTENT_S -->
+                   <script type="text/javascript" src="./RNAfold web server_2_files/wz_tooltip.js"></script><script type="text/javascript">
+
+CENTROIDprobability_colors = new Array('#dc1400','#dc7800','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc2800','#dc2800','#dc1400','#dc1400','#dc1400','#dc6400','#dc1400','#dc1400','#dc1400','#dc7800','#dcc800','#dca000','#dc5000','#b4dc00','#dc8c00','#dc8c00','#dc2800','#dc2800','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc8c00','#dc8c00','#b4dc00','#dc1400','#dca000','#dcc800','#dc5000','#dcb400','#dcc800','#dc1400','#dc2800','#dc1400','#dc1400','#dc1400','#dc1400','#50dc00','#00b4dc','#64dc00','#dc1400','#dc1400','#dc1400','#64dc00','#00c8dc','#50dc00','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc2800','#dc2800','#dcc800','#dcb400','#dcdc00','#dc7800','#dc1400','#dc1400','#dc1400','#dc6400','#dc1400','#dc1400','#dc1400','#dc1400','#dc2800','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc7800','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400');
+
+CENTROIDposen_colors = new Array('#dc1400','#8cdc00','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc5000','#dc5000','#dc2800','#dc1400','#dc1400','#8cdc00','#dc3c00','#dc1400','#dc1400','#8cdc00','#00dc14','#00dc28','#dcdc00','#00dcdc','#50dc00','#50dc00','#dc8c00','#dc8c00','#dc2800','#dc2800','#dc2800','#dc5000','#dc3c00','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc5000','#dc2800','#dc2800','#dc2800','#dc2800','#dc1400','#dc1400','#50dc00','#3cdc00','#00dca0','#dc5000','#14dc00','#00dc78','#a0dc00','#00dc78','#14dc00','#dc5000','#dc6400','#dc2800','#dc2800','#dc3c00','#dc2800','#00dc64','#0064dc','#00dc64','#dc1400','#dc1400','#dc1400','#00dc64','#0050dc','#00dc78','#dc1400','#dc1400','#dc3c00','#dc2800','#dc2800','#dc5000','#dc6400','#00dc3c','#00dc00','#00dc28','#78dc00','#dc1400','#dc1400','#dc2800','#8cdc00','#dc1400','#dc5000','#dc3c00','#dc3c00','#dc5000','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#78dc00','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400');
+
+</script>
+
+<script type="text/javascript">
+
+MFEprobability_colors = new Array('#dc1400','#dc7800','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc2800','#dc2800','#dc1400','#dc1400','#dc1400','#dc6400','#dc1400','#dc1400','#dc1400','#dc7800','#dcc800','#dca000','#dc5000','#b4dc00','#dc8c00','#dc8c00','#dc2800','#dc2800','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc8c00','#dc8c00','#b4dc00','#dc1400','#dca000','#dcc800','#dc5000','#dcb400','#dcc800','#dc1400','#dc2800','#dc1400','#dc1400','#dc1400','#dc1400','#00dc14','#00dc28','#64dc00','#dc1400','#dc1400','#dc1400','#00dc28','#00dc14','#50dc00','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc2800','#dc2800','#dcc800','#dcb400','#dcdc00','#dc7800','#dc1400','#dc1400','#dc1400','#dc6400','#dc1400','#dc1400','#dc1400','#dc1400','#dc2800','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc7800','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400');
+
+MFEposen_colors = new Array('#dc1400','#8cdc00','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc5000','#dc5000','#dc2800','#dc1400','#dc1400','#8cdc00','#dc3c00','#dc1400','#dc1400','#8cdc00','#00dc14','#00dc28','#dcdc00','#00dcdc','#50dc00','#50dc00','#dc8c00','#dc8c00','#dc2800','#dc2800','#dc2800','#dc5000','#dc3c00','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc5000','#dc2800','#dc2800','#dc2800','#dc2800','#dc1400','#dc1400','#50dc00','#3cdc00','#00dca0','#dc5000','#14dc00','#00dc78','#a0dc00','#00dc78','#14dc00','#dc5000','#dc6400','#dc2800','#dc2800','#dc3c00','#dc2800','#00dc64','#0064dc','#00dc64','#dc1400','#dc1400','#dc1400','#00dc64','#0050dc','#00dc78','#dc1400','#dc1400','#dc3c00','#dc2800','#dc2800','#dc5000','#dc6400','#00dc3c','#00dc00','#00dc28','#78dc00','#dc1400','#dc1400','#dc2800','#8cdc00','#dc1400','#dc5000','#dc3c00','#dc3c00','#dc5000','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#78dc00','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400','#dc1400');
+
+</script>
+
+
+
+<h3>Results for minimum free energy prediction</h3>
+
+<p>The optimal secondary structure in <a href="javascript:void(0)" onmouseover="Tip(&#39;The characters &quot;(&quot; and &quot;)&quot; correspond to the 5’ base and the 3’ base in the base-pair, respectively,&lt;br&gt; while &quot;.&quot; denotes an unpaired base.&#39;)" style="cursor:help;border-bottom:1px dotted #000;color:#222222;">dot-bracket notation</a> with a minimum free energy of <b>-33.40</b> kcal/mol is given below.<br> 
+
+
+
+[<a href="javascript:show_probs(&#39;probs&#39;, &#39;MFE_sequence_span&#39;,&#39;MFE_structure_span&#39;, MFE_sequence, MFE_structure, MFEprobability_colors, MFEposen_colors);">color by base-pairing probability</a> | <a href="javascript:show_probs(&#39;posen&#39;, &#39;MFE_sequence_span&#39;,&#39;MFE_structure_span&#39;, MFE_sequence, MFE_structure, MFEprobability_colors, MFEposen_colors);">color by positional entropy</a> | <a href="javascript:show_probs(&#39;none&#39;, &#39;MFE_sequence_span&#39;,&#39;MFE_structure_span&#39;, MFE_sequence, MFE_structure, MFEprobability_colors, MFEposen_colors);">no coloring</a>]<br>
+
+</p><pre style="line-height:1.3em;"><span id="MFE_sequence_span"><pre>1      UUCUCCUUCGGUACAUCCAGCUGAUGAGUCCCAAAUAGGACGAAAUUUGCAGAAGAGCACGUAUACGCAAGCUCCUCCUGGAUUCCACGAAGGAGAUAUACC</pre></span></pre>
+
+<pre style="line-height:1.3em;"><span id="MFE_structure_span"><pre>1      .(((((((((....(((((((.(((..((((......))))...))).)).((.((((.((....))...)))).)).)))))....)))))))))......</pre></span></pre>
+
+<script type="text/javascript">
+
+var MFE_sequence =  "1      UUCUCCUUCGGUACAUCCAGCUGAUGAGUCCCAAAUAGGACGAAAUUUGCAGAAGAGCACGUAUACGCAAGCUCCUCCUGGAUUCCACGAAGGAGAUAUACC";
+
+var MFE_structure =  "1      .(((((((((....(((((((.(((..((((......))))...))).)).((.((((.((....))...)))).)).)))))....)))))))))......";
+
+document.getElementById('MFE_sequence_span').innerHTML='<pre>'+MFE_sequence+'</pre>';
+
+document.getElementById('MFE_structure_span').innerHTML='<pre>'+MFE_structure+'</pre>';
+
+</script>
+
+
+
+
+
+You can download the minimum free energy (MFE) structure in [<a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1.vienna" style="font-family:Courier New,Courier;">Vienna Format</a>|
+
+<a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1.ct" style="font-family:Courier New,Courier;">Ct Format</a>].
+
+You can get thermodynamic details on this structure by submitting to our <a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/RNAeval.cgi?SEQUENCE=UUCUCCUUCGGUACAUCCAGCUGAUGAGUCCCAAAUAGGACGAAAUUUGCAGAAGAGCACGUAUACGCAAGCUCCUCCUGGAUUCCACGAAGGAGAUAUACC&amp;STRUCTURE=.(((((((((....(((((((.(((..((((......))))...))).)).((.((((.((....))...)))).)).)))))....)))))))))......" target="_blank">RNAeval web server</a>.
+
+
+
+<!--RNAPKPLEX-->
+
+
+
+<p></p>
+
+
+
+<!--ENSEMBLE_START-->
+
+<h3>Results for thermodynamic ensemble prediction</h3>
+
+<p>The free energy of the thermodynamic ensemble is  <b>-34.68</b> kcal/mol.<br>
+
+The <a href="javascript:void(0)" onmouseover="Tip(&#39;The probability of a singe structure in the Boltzmann weighted ensemble of all structures is given by P = e^(-E/RT)/Q. Where E is the energy of the structure and Q is the partition function.&#39;)" style="cursor:help;border-bottom:1px dotted #000;color:#222222;">frequency of the MFE structure</a> in the ensemble is <b>12.52</b> %.<br>
+
+The <a href="javascript:void(0)" onmouseover="Tip(&#39;The ensemble diversity is the average base-pair distance between all structures in the thermodynamic ensemble.&#39;)" style="cursor:help;border-bottom:1px dotted #000;color:#222222;">ensemble diversity</a> is <b> 6.16  </b>.<br>
+
+You may look at the <b>dot plot</b> containing the base pair probabilities [<a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_dp.eps" style="font-family:Courier New,Courier;">EPS</a>|<a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_dp.pdf" style="font-family:Courier New,Courier;">PDF</a>|<a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/IC.cgi?file=RNAfold/CMvwNqK4CL/sequence1_dp.eps" style="font-family:Courier New,Courier;">IMAGE CONVERTER</a>].
+
+<br>
+
+<br>    
+
+The <a href="javascript:void(0)" onmouseover="Tip(&#39;The centroid structure is the structure with the minimum total base-pair distance to all structures in the thermodynamic ensemble.&#39;)" style="cursor:help;border-bottom:1px dotted #000;color:#222222;">centroid secondary structure</a> in dot-bracket notation
+
+with a minimum free energy of <b>-32.60</b> kcal/mol is given below.<br>
+
+
+
+[<a href="javascript:show_probs(&#39;probs&#39;, &#39;CENTROID_sequence_span&#39;,&#39;CENTROID_structure_span&#39;, CENTROID_sequence, CENTROID_structure, CENTROIDprobability_colors, CENTROIDposen_colors);">color by base-pairing probability</a> | <a href="javascript:show_probs(&#39;posen&#39;, &#39;CENTROID_sequence_span&#39;,&#39;CENTROID_structure_span&#39;, CENTROID_sequence, CENTROID_structure, CENTROIDprobability_colors, CENTROIDposen_colors);">color by positional entropy</a> | <a href="javascript:show_probs(&#39;none&#39;, &#39;CENTROID_sequence_span&#39;,&#39;CENTROID_structure_span&#39;, CENTROID_sequence, CENTROID_structure, CENTROIDprobability_colors, CENTROIDposen_colors);">no coloring</a>]<br>
+
+</p><pre style="line-height:1.3em;"><span id="CENTROID_sequence_span"><pre>1      UUCUCCUUCGGUACAUCCAGCUGAUGAGUCCCAAAUAGGACGAAAUUUGCAGAAGAGCACGUAUACGCAAGCUCCUCCUGGAUUCCACGAAGGAGAUAUACC</pre></span></pre>
+
+<pre style="line-height:1.3em;"><span id="CENTROID_structure_span"><pre>1      .(((((((((....(((((((.(((..((((......))))...))).)).((.((((............)))).)).)))))....)))))))))......</pre></span></pre>
+
+<script type="text/javascript">
+
+var CENTROID_sequence =  "1      UUCUCCUUCGGUACAUCCAGCUGAUGAGUCCCAAAUAGGACGAAAUUUGCAGAAGAGCACGUAUACGCAAGCUCCUCCUGGAUUCCACGAAGGAGAUAUACC";
+
+var CENTROID_structure =  "1      .(((((((((....(((((((.(((..((((......))))...))).)).((.((((............)))).)).)))))....)))))))))......";
+
+document.getElementById('CENTROID_sequence_span').innerHTML='<pre>'+CENTROID_sequence+'</pre>';
+
+document.getElementById('CENTROID_structure_span').innerHTML='<pre>'+CENTROID_structure+'</pre>';
+
+</script>
+
+
+
+You can download the minimum free energy (MFE) structure in [<a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_centroid.vienna" style="font-family:Courier New,Courier;">Vienna Format</a>|
+
+<a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_centroid.ct" style="font-family:Courier New,Courier;">Ct Format</a>].
+
+You can get thermodynamic details on this structure by submitting to our <a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/RNAeval.cgi?SEQUENCE=UUCUCCUUCGGUACAUCCAGCUGAUGAGUCCCAAAUAGGACGAAAUUUGCAGAAGAGCACGUAUACGCAAGCUCCUCCUGGAUUCCACGAAGGAGAUAUACC&amp;STRUCTURE=.(((((((((....(((((((.(((..((((......))))...))).)).((.((((............)))).)).)))))....)))))))))......" target="_blank">RNAeval web server</a>.
+
+<!--ENSEMBLE_END-->       
+
+<p></p>
+
+<h3>Graphical output</h3>
+
+<!--SVG_START-->    
+
+<p>You may look at the interactive drawing of the MFE structure below. If you do not see the interactive drawing and you are using Internet Explorer, please install the <a href="http://www.adobe.com/svg/viewer/install/main.html" target="_blank">Adobe SVG plugin</a>. <b>A note on base-pairing probabilities:</b> The structure below is colored by base-pairing probabilities. For unpaired regions the color denotes the probability of being unpaired.</p>
+
+<div align="center">
+
+ <iframe src="./RNAfold web server_2_files/sequence1_ss.svg" width="452" height="650" style="border:0;">
+
+   your browser does not understand the &lt;iframe&gt; tag
+
+ </iframe>
+
+ <!--SVGCENTROID_START-->
+
+ <iframe src="./RNAfold web server_2_files/sequence1_centroid.svg" width="452" height="650" style="border:0;">
+
+   your browser does not understand the &lt;iframe&gt; tag
+
+ </iframe>
+
+ <!--SVGCENTROID_END-->
+
+</div>    
+
+<!--SVG_END-->
+
+
+
+<div align="center">    
+
+<table style="width:66%;margin-left:auto;margin-right:auto;border:1;">
+
+    <!--PLAINSTRUCT_START-->
+
+    <tbody><tr>
+
+        <th style="text-align:left;" align="left">Image description</th>
+
+        <th>Download options</th>
+
+    </tr>
+
+    <tr>
+
+        <td>MFE plain structure drawing</td>
+
+        <td style="text-align:center;" align="center">
+
+          [
+
+          <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_ss.eps" style="font-family:Courier New,Courier;">EPS</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_ss.pdf" style="font-family:Courier New,Courier;">PDF</a>
+
+          | <a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/IC.cgi?file=RNAfold/CMvwNqK4CL/sequence1_ss.eps" style="font-family:Courier New,Courier;">IMAGE CONVERTER</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/forna/forna.html?id=RNAfold/CMvwNqK4CL&amp;file=mfe.json" style="font-family:Courier New,Courier;">VIEW IN FORNA</a>
+
+          ]</td>
+
+    </tr>
+
+    <!--CENTROID_PLAINSTRUCT_START-->
+
+    <tr>
+
+        <td>Centroid plain structure drawing</td>
+
+        <td style="text-align:center;" align="center">
+
+          [
+
+          <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_centroid.eps" style="font-family:Courier New,Courier;">EPS</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_centroid.pdf" style="font-family:Courier New,Courier;">PDF</a>
+
+          | <a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/IC.cgi?file=RNAfold/CMvwNqK4CL/sequence1_centroid.eps" style="font-family:Courier New,Courier;">IMAGE CONVERTER</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/forna/forna.html?id=RNAfold/CMvwNqK4CL&amp;file=cent.json" style="font-family:Courier New,Courier;">VIEW IN FORNA</a>
+
+          ]</td>
+
+    </tr>
+
+    <!--CENTROID_PLAINSTRUCT_END-->
+
+    <!--PLAINSTRUCT_END-->
+
+    <!--PP_START-->
+
+     <tr><td>&nbsp;</td><td></td></tr>
+
+     <tr>
+
+        <td>MFE structure drawing encoding base-pair probabilities</td>
+
+        <td style="text-align:center;" align="center">
+
+          [
+
+          <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_pp.eps" style="font-family:Courier New,Courier;">EPS</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_pp.pdf" style="font-family:Courier New,Courier;">PDF</a>
+
+          | <a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/IC.cgi?file=RNAfold/CMvwNqK4CL/sequence1_pp.eps" style="font-family:Courier New,Courier;">IMAGE CONVERTER</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/forna/forna.html?id=RNAfold/CMvwNqK4CL&amp;file=mfe_probs.json" style="font-family:Courier New,Courier;">VIEW IN FORNA</a>
+
+          ]</td>
+
+    </tr>
+
+     <tr>
+
+        <td>Centroid structure drawing encoding base-pair probabilities</td>
+
+        <td style="text-align:center;" align="center">
+
+          [
+
+            <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_centroid_pp.eps" style="font-family:Courier New,Courier;">EPS</a>
+
+            | <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_centroid_pp.pdf" style="font-family:Courier New,Courier;">PDF</a>
+
+            | <a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/IC.cgi?file=RNAfold/CMvwNqK4CL/sequence1_centroid_pp.eps" style="font-family:Courier New,Courier;">IMAGE CONVERTER</a>
+
+            | <a href="http://rna.tbi.univie.ac.at/forna/forna.html?id=RNAfold/CMvwNqK4CL&amp;file=cent_probs.json" style="font-family:Courier New,Courier;">VIEW IN FORNA</a>
+
+            ]</td>
+
+    </tr>
+
+    <!--PP_END-->
+
+    <!--PE_START-->
+
+    <tr><td>&nbsp;</td><td></td></tr>
+
+    <tr>
+
+        <td>MFE structure drawing encoding positional entropy</td>
+
+        <td style="text-align:center;" align="center">
+
+          [
+
+          <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_pe.eps" style="font-family:Courier New,Courier;">EPS</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_pe.pdf" style="font-family:Courier New,Courier;">PDF</a>
+
+          | <a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/IC.cgi?file=RNAfold/CMvwNqK4CL/sequence1_pe.eps" style="font-family:Courier New,Courier;">IMAGE CONVERTER</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/forna/forna.html?id=RNAfold/CMvwNqK4CL&amp;file=mfe_posent.json" style="font-family:Courier New,Courier;">VIEW IN FORNA</a>
+
+          ]</td>      
+
+    </tr>
+
+    <tr>
+
+        <td>Centroid structure drawing encoding positional entropy</td>
+
+        <td style="text-align:center;" align="center">
+
+          [
+
+          <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_centroid_pe.eps" style="font-family:Courier New,Courier;">EPS</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_centroid_pe.pdf" style="font-family:Courier New,Courier;">PDF</a>
+
+          | <a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/IC.cgi?file=RNAfold/CMvwNqK4CL/sequence1_centroid_pe.eps" style="font-family:Courier New,Courier;">IMAGE CONVERTER</a>
+
+          | <a href="http://rna.tbi.univie.ac.at/forna/forna.html?id=RNAfold/CMvwNqK4CL&amp;file=cent_posent.json" style="font-family:Courier New,Courier;">VIEW IN FORNA</a>
+
+          ]</td>      
+
+    </tr>
+
+    <!--PE_END-->
+
+</tbody></table>    
+
+</div>    
+
+<!--MOUNTAIN_START-->
+
+<p> Here you find a <a href="javascript:void(0)" onmouseover="Tip(&#39;A mountain plot represents a secondary structure in a plot of height versus position,&lt;br&gt; where the height m(k) is given by the number of base pairs enclosing the base at position k.&lt;br&gt; I.e. loops correspond to plateaus (hairpin loops are peaks), helices to slopes.&#39;)" style="cursor:help;border-bottom:1px dotted #000;color:#222222;">mountain plot</a> representation of the MFE structure<!--ENSEMBLE_START-->, the thermodynamic ensemble of RNA structures, and the centroid structure. Additionally we present the positional entropy for each position<!--ENSEMBLE_END-->. Download as [<a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_mountain.eps" style="font-family:Courier New,Courier;">EPS</a>|<a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1_mountain.pdf" style="font-family:Courier New,Courier;">PDF</a>|<a href="http://rna.tbi.univie.ac.at//cgi-bin/RNAWebSuite/IC.cgi?file=RNAfold/CMvwNqK4CL/sequence1_mountain.pdf" style="font-family:Courier New,Courier;">IMAGE CONVERTER</a>].</p>
+
+<div align="center">
+
+    <img src="./RNAfold web server_2_files/sequence1_mountain.png" alt="Mountain plot">
+
+</div>
+
+<!--MOUNTAIN_END-->
+
+<p> Results have been computed using RNAfold 2.6.3. An equivalent command line call would have been<br>
+
+<tt>
+
+RNAfold -p -d2 --noLP &lt; <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1.fa">sequence1.fa</a> &gt; <a href="http://rna.tbi.univie.ac.at/RNAfold/CMvwNqK4CL/sequence1.out">sequence1.out</a>
+
+</tt>
+
+</p>
+
+<hr style="width:90%;margin-left:auto;margin-right:auto;">
+
+<p><b>RNA parameters are described in</b><br>
+
+Mathews DH, Disney MD, Childs JL, Schroeder SJ, Zuker M, Turner DH. (2004) Incorporating chemical modification constraints into a dynamic programming algorithm for prediction of RNA secondary structure. <i>Proc Natl Acad Sci U S A</i> 101(19):7287-92.</p>
+
+<p><b>If you find these results helpful for your work you may want to cite:</b></p>
+
+<table border="0">
+
+<tbody><tr>
+
+ <td><a href="https://academic.oup.com/nar/article/36/suppl_2/W70/2505776" target="_blank"><img src="./RNAfold web server_2_files/open_access.gif"></a>
+
+ </td>
+
+<td>Gruber AR, Lorenz R, Bernhart SH, Neuböck R, Hofacker IL. <br><a href="https://academic.oup.com/nar/article/36/suppl_2/W70/2505776" target="_blank"><b>The Vienna RNA Websuite.</b></a> Nucleic Acids Research, Volume 36, Issue suppl_2, 1 July 2008, Pages W70-W74, DOI: 10.1093/nar/gkn188
+
+ </td>
+
+</tr> 
+
+</tbody></table>
+
+<p>Lorenz, R. and Bernhart, S.H. and Höner zu Siederdissen, C. and Tafer, H. and Flamm, C. and Stadler, P.F. and Hofacker, I.L. "ViennaRNA Package 2.0", Algorithms for Molecular Biology, 6:1 page(s): 26, 2011</p>
+
+    
+
+                   <!-- CONTENT_E --></div>
+                <div class="clear"></div>
+        </div>
+</div>
+<div id="footer">
+        <div id="footerleft">&nbsp;</div>
+        <div id="footerright">&nbsp;</div>
+        <div id="footermain">&nbsp;</div>
+        <div class="clear"><a href="http://www.tbi.univie.ac.at/" target="_blank">
+     Institute for Theoretical Chemistry</a> | <a href="http://www.univie.ac.at/" target="_blank">University of Vienna</a> |
+     <a href="mailto:rna@tbi.univie.ac.at?subject=RNA%20Web%20Suite">rna@tbi.univie.ac.at</a></div>        
+</div>
+</div>
+
+</body></html>
