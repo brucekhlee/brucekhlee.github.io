@@ -1,1 +1,131 @@
-us-tw.html
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eastern Time & Taiwan Time</title>
+
+<style>
+body {
+    margin: 100px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f5f5f5;
+}
+
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+
+.clock {
+	width: 400px;
+	max-width: 80%;
+	background: #ffffff;
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.time {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #0066cc;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="clock">
+        <div class="title">🇺🇸 美東時間 / Eastern Time</div>
+        <div id="et" class="time"></div>
+    </div>
+
+    <div class="clock">
+        <div class="title">🇹🇼 台灣時間 / Taiwan Time</div>
+        <div id="tw" class="time"></div>
+    </div>
+
+</div>
+
+<script>
+function updateTimes() {
+    const now = new Date();
+
+    const easternEnglish = now.toLocaleString("en-US", {
+        timeZone: "America/New_York",
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+
+    const easternChinese = now.toLocaleString("zh-TW", {
+        timeZone: "America/New_York",
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    });
+
+    const taiwanEnglish = now.toLocaleString("en-US", {
+        timeZone: "Asia/Taipei",
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+
+    const taiwanChinese = now.toLocaleString("zh-TW", {
+        timeZone: "Asia/Taipei",
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    });
+
+    document.getElementById("et").innerHTML =
+        easternChinese +
+        "<br>" +
+        easternEnglish;
+
+    document.getElementById("tw").innerHTML =
+        taiwanChinese +
+        "<br>" +
+        taiwanEnglish;
+}
+
+updateTimes();
+setInterval(updateTimes, 1000);
+</script>
+
+</body>
+</html>
